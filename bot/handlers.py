@@ -3,7 +3,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
 from services.game_service import search_game, get_game_details
 from services.price_tracker import get_current_discounts
-from data.data_manager import add_subscription, remove_subscription, get_user_subscriptions
+from data.data_manager import add_subscription, remove_subscription, get_user_subscriptions, update_user_info
+from flask import current_app
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, 
@@ -14,6 +15,20 @@ logger = logging.getLogger(__name__)
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a welcome message when the command /start is issued."""
     user = update.effective_user
+    
+    # Save user info to database
+    with current_app.app_context():
+        try:
+            update_user_info(
+                user_id=user.id,
+                username=user.username,
+                first_name=user.first_name,
+                last_name=user.last_name
+            )
+            logger.info(f"User data saved to database: {user.id}")
+        except Exception as e:
+            logger.error(f"Error saving user data: {e}")
+    
     await update.message.reply_html(
         f"Hi {user.mention_html()}! 👋\n\n"
         "I'm a Game Discount Tracker Bot. I can help you track price drops for your favorite games "
@@ -90,16 +105,19 @@ async def subscribe_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             await update.message.reply_text(f"Game with ID {game_id} not found. Please check the ID and try again.")
             return
         
-        # Add subscription
-        success = add_subscription(user_id, game_id, game_details.get('name', 'Unknown Game'))
+        # Add subscription with app context
+        with current_app.app_context():
+            # Get thumbnail if available
+            thumbnail = game_details.get('thumbnail', None)
+            success = add_subscription(user_id, game_id, game_details.get('name', 'Unknown Game'), thumbnail)
         
-        if success:
-            await update.message.reply_text(
-                f"✅ You are now subscribed to price alerts for {game_details.get('name')}.\n"
-                f"I'll notify you when the price drops!"
-            )
-        else:
-            await update.message.reply_text(f"You're already subscribed to this game.")
+            if success:
+                await update.message.reply_text(
+                    f"✅ You are now subscribed to price alerts for {game_details.get('name')}.\n"
+                    f"I'll notify you when the price drops!"
+                )
+            else:
+                await update.message.reply_text(f"You're already subscribed to this game.")
             
     except Exception as e:
         logger.error(f"Error in subscribe_game: {e}")
@@ -115,13 +133,14 @@ async def unsubscribe_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     user_id = update.effective_user.id
     
     try:
-        # Remove subscription
-        success, game_name = remove_subscription(user_id, game_id)
+        # Remove subscription with app context
+        with current_app.app_context():
+            success, game_name = remove_subscription(user_id, game_id)
         
-        if success:
-            await update.message.reply_text(f"✅ You have unsubscribed from price alerts for {game_name}.")
-        else:
-            await update.message.reply_text("You're not subscribed to this game.")
+            if success:
+                await update.message.reply_text(f"✅ You have unsubscribed from price alerts for {game_name}.")
+            else:
+                await update.message.reply_text("You're not subscribed to this game.")
             
     except Exception as e:
         logger.error(f"Error in unsubscribe_game: {e}")
