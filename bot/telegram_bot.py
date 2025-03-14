@@ -54,9 +54,10 @@ def start_bot(app=None):
 class BotThread(threading.Thread):
     """Thread class for running the Telegram bot with its own event loop"""
     
-    def __init__(self, application):
+    def __init__(self, application, flask_app=None):
         super().__init__()
         self.application = application
+        self.flask_app = flask_app
         self.daemon = True
         
     def run(self):
@@ -72,6 +73,19 @@ class BotThread(threading.Thread):
             
             # Define an async function to run the bot
             async def start_bot_async():
+                # Wrap all handlers with application context if Flask app is provided
+                if self.flask_app:
+                    # Store the original process_update method
+                    original_process_update = self.application.process_update
+                    
+                    # Define a new process_update method that uses app context
+                    async def process_update_with_context(update):
+                        with self.flask_app.app_context():
+                            return await original_process_update(update)
+                    
+                    # Replace the method with our wrapped version
+                    self.application.process_update = process_update_with_context
+                
                 await self.application.initialize()
                 await self.application.start()
                 await self.application.updater.start_polling()
@@ -83,11 +97,12 @@ class BotThread(threading.Thread):
         except Exception as e:
             logger.error(f"Error running Telegram bot: {e}")
             
-def run_bot(application):
+def run_bot(application, flask_app=None):
     """Start the bot in a separate thread with its own event loop
     
     Args:
         application: The initialized Telegram application
+        flask_app: Flask application instance for context (optional)
     """
     if not application:
         logger.error("Cannot run bot: application not initialized.")
@@ -96,7 +111,7 @@ def run_bot(application):
     try:
         # Start the Bot in a dedicated thread
         logger.info("Starting Telegram bot in a separate thread...")
-        bot_thread = BotThread(application)
+        bot_thread = BotThread(application, flask_app)
         bot_thread.start()
         return bot_thread
     except Exception as e:

@@ -88,8 +88,8 @@ def run_bot():
         if bot_app is None:
             logger.warning("Telegram bot not started. Use the web interface to set up the bot.")
         else:
-            # Run the bot with the initialized application
-            run_telegram_bot(bot_app)
+            # Run the bot with the initialized application and pass Flask app for context
+            run_telegram_bot(bot_app, app)
     except Exception as e:
         logger.error(f"Error starting Telegram bot: {e}")
 
