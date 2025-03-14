@@ -11,4 +11,5 @@ dependencies = [
     "gunicorn>=23.0.0",
     "python-telegram-bot>=21.11.1",
     "psycopg2-binary>=2.9.10",
+    "sqlalchemy>=2.0.39",
 ]

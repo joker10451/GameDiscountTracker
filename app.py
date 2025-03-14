@@ -59,7 +59,8 @@ def run_bot():
 def run_scheduler():
     try:
         logger.info("Starting price tracker scheduler...")
-        start_scheduler()
+        # Pass app instance to scheduler
+        start_scheduler(app)
     except Exception as e:
         logger.error(f"Error starting price tracker scheduler: {e}")
 

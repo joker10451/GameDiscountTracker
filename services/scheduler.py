@@ -12,13 +12,21 @@ logger = logging.getLogger(__name__)
 # Create a scheduler
 scheduler = BackgroundScheduler()
 
+# Global app reference
+flask_app = None
+
 async def scheduled_price_check():
     """Job to check prices and send notifications"""
     try:
         logger.info("Running scheduled price check...")
-        price_drops = await check_price_updates()
-        await send_price_drop_notifications(price_drops)
-        logger.info("Scheduled price check completed.")
+        # Use the global app reference
+        if flask_app:
+            with flask_app.app_context():
+                price_drops = await check_price_updates()
+                await send_price_drop_notifications(price_drops)
+                logger.info("Scheduled price check completed.")
+        else:
+            logger.error("Flask app not available for scheduler. Skipping price check.")
     except Exception as e:
         logger.error(f"Error in scheduled price check: {e}")
 
@@ -28,8 +36,18 @@ def run_async_job():
     asyncio.set_event_loop(loop)
     loop.run_until_complete(scheduled_price_check())
 
-def start_scheduler():
-    """Start the APScheduler for price checking"""
+def start_scheduler(app=None):
+    """Start the APScheduler for price checking
+    
+    Args:
+        app: Flask application instance (optional)
+    """
+    global flask_app
+    
+    # Set the Flask app for future context use
+    if app:
+        flask_app = app
+    
     if scheduler.running:
         logger.info("Scheduler is already running.")
         return

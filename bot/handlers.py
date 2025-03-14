@@ -151,29 +151,31 @@ async def list_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user_id = update.effective_user.id
     
     try:
-        subscriptions = get_user_subscriptions(user_id)
+        # Get subscriptions with app context
+        with current_app.app_context():
+            subscriptions = get_user_subscriptions(user_id)
         
-        if not subscriptions:
-            await update.message.reply_text(
-                "You don't have any game subscriptions yet.\n"
-                "Use /search to find games and subscribe to them!"
-            )
-            return
-        
-        reply_text = "🎮 Your Game Subscriptions:\n\n"
-        keyboard = []
-        
-        for game_id, game_info in subscriptions.items():
-            game_name = game_info.get('name', 'Unknown Game')
-            reply_text += f"• {game_name} (ID: {game_id})\n"
+            if not subscriptions:
+                await update.message.reply_text(
+                    "You don't have any game subscriptions yet.\n"
+                    "Use /search to find games and subscribe to them!"
+                )
+                return
             
-            # Add button to unsubscribe
-            keyboard.append([
-                InlineKeyboardButton(f"Unsubscribe from {game_name}", callback_data=f"unsub_{game_id}")
-            ])
-        
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(reply_text, reply_markup=reply_markup)
+            reply_text = "🎮 Your Game Subscriptions:\n\n"
+            keyboard = []
+            
+            for game_id, game_info in subscriptions.items():
+                game_name = game_info.get('name', 'Unknown Game')
+                reply_text += f"• {game_name} (ID: {game_id})\n"
+                
+                # Add button to unsubscribe
+                keyboard.append([
+                    InlineKeyboardButton(f"Unsubscribe from {game_name}", callback_data=f"unsub_{game_id}")
+                ])
+            
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await update.message.reply_text(reply_text, reply_markup=reply_markup)
         
     except Exception as e:
         logger.error(f"Error in list_subscriptions: {e}")
@@ -237,28 +239,32 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 await query.edit_message_text(text=f"Game with ID {game_id} not found. Please try another game.")
                 return
             
-            # Add subscription
-            success = add_subscription(user_id, game_id, game_details.get('name', 'Unknown Game'))
+            # Add subscription with app context
+            with current_app.app_context():
+                # Get thumbnail if available
+                thumbnail = game_details.get('thumbnail', None)
+                success = add_subscription(user_id, game_id, game_details.get('name', 'Unknown Game'), thumbnail)
             
-            if success:
-                await query.edit_message_text(
-                    text=f"✅ You are now subscribed to price alerts for {game_details.get('name')}.\n"
-                         f"I'll notify you when the price drops!"
-                )
-            else:
-                await query.edit_message_text(text=f"You're already subscribed to this game.")
+                if success:
+                    await query.edit_message_text(
+                        text=f"✅ You are now subscribed to price alerts for {game_details.get('name')}.\n"
+                             f"I'll notify you when the price drops!"
+                    )
+                else:
+                    await query.edit_message_text(text=f"You're already subscribed to this game.")
                 
         elif data.startswith('unsub_'):
             game_id = data[6:]
             user_id = update.effective_user.id
             
-            # Remove subscription
-            success, game_name = remove_subscription(user_id, game_id)
+            # Remove subscription with app context
+            with current_app.app_context():
+                success, game_name = remove_subscription(user_id, game_id)
             
-            if success:
-                await query.edit_message_text(text=f"✅ You have unsubscribed from price alerts for {game_name}.")
-            else:
-                await query.edit_message_text(text="You're not subscribed to this game.")
+                if success:
+                    await query.edit_message_text(text=f"✅ You have unsubscribed from price alerts for {game_name}.")
+                else:
+                    await query.edit_message_text(text="You're not subscribed to this game.")
                 
         elif data.startswith('details_'):
             game_id = data[8:]
