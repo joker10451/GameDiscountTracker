@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="dark">
+<html lang="ru" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Game Discount Tracker Bot</title>
+    <title>Бот отслеживания скидок на игры</title>
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
 </head>
@@ -13,25 +13,25 @@
             <div class="col-md-8">
                 <div class="d-flex justify-content-between align-items-center mb-5">
                     <div>
-                        <h1 class="display-4">🎮 Game Discount Tracker Bot</h1>
-                        <p class="lead">Track price drops for your favorite games across various digital stores!</p>
+                        <h1 class="display-4">🎮 Бот скидок на игры</h1>
+                        <p class="lead">Отслеживайте снижение цен на ваши любимые игры в разных цифровых магазинах!</p>
                     </div>
                     <div>
                         <a href="/settings" class="btn btn-outline-secondary">
-                            <i class="bi bi-gear"></i> Settings
+                            <i class="bi bi-gear"></i> Настройки
                         </a>
                     </div>
                 </div>
 
                 <div class="card mb-4 bg-dark">
                     <div class="card-body">
-                        <h2 class="card-title">How It Works</h2>
+                        <h2 class="card-title">Как это работает</h2>
                         <div class="card-text">
                             <ol class="list-group list-group-numbered mb-3">
-                                <li class="list-group-item bg-dark">Start the bot on Telegram</li>
-                                <li class="list-group-item bg-dark">Search for your favorite games</li>
-                                <li class="list-group-item bg-dark">Subscribe to price alerts</li>
-                                <li class="list-group-item bg-dark">Get notified when prices drop!</li>
+                                <li class="list-group-item bg-dark">Запустите бота в Telegram</li>
+                                <li class="list-group-item bg-dark">Найдите ваши любимые игры</li>
+                                <li class="list-group-item bg-dark">Подпишитесь на уведомления о ценах</li>
+                                <li class="list-group-item bg-dark">Получайте уведомления при снижении цен!</li>
                             </ol>
                         </div>
                     </div>
@@ -39,36 +39,36 @@
 
                 <div class="card mb-4 bg-dark">
                     <div class="card-body">
-                        <h2 class="card-title">Available Commands</h2>
+                        <h2 class="card-title">Доступные команды</h2>
                         <div class="card-text">
                             <ul class="list-group mb-3">
                                 <li class="list-group-item bg-dark d-flex justify-content-between">
                                     <span><code>/start</code></span>
-                                    <span>Start the bot</span>
+                                    <span>Запуск бота</span>
                                 </li>
                                 <li class="list-group-item bg-dark d-flex justify-content-between">
                                     <span><code>/help</code></span>
-                                    <span>Show help message</span>
+                                    <span>Показать справку</span>
                                 </li>
                                 <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/search &lt;game_name&gt;</code></span>
-                                    <span>Search for games</span>
+                                    <span><code>/search &lt;название_игры&gt;</code></span>
+                                    <span>Поиск игр</span>
                                 </li>
                                 <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/subscribe &lt;game_id&gt;</code></span>
-                                    <span>Subscribe to price alerts</span>
+                                    <span><code>/subscribe &lt;id_игры&gt;</code></span>
+                                    <span>Подписаться на уведомления о цене</span>
                                 </li>
                                 <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/unsubscribe &lt;game_id&gt;</code></span>
-                                    <span>Unsubscribe from price alerts</span>
+                                    <span><code>/unsubscribe &lt;id_игры&gt;</code></span>
+                                    <span>Отписаться от уведомлений о цене</span>
                                 </li>
                                 <li class="list-group-item bg-dark d-flex justify-content-between">
                                     <span><code>/mysubs</code></span>
-                                    <span>List your subscriptions</span>
+                                    <span>Список ваших подписок</span>
                                 </li>
                                 <li class="list-group-item bg-dark d-flex justify-content-between">
                                     <span><code>/discounts</code></span>
-                                    <span>Show current discounts</span>
+                                    <span>Показать текущие скидки</span>
                                 </li>
                             </ul>
                         </div>
@@ -77,7 +77,7 @@
 
                 <div class="card mb-4 bg-dark">
                     <div class="card-body">
-                        <h2 class="card-title">Supported Game Stores</h2>
+                        <h2 class="card-title">Поддерживаемые магазины игр</h2>
                         <div class="card-text">
                             <div class="row text-center">
                                 <div class="col-md-4 mb-3">
@@ -103,7 +103,7 @@
                                 </div>
                             </div>
                             <div class="text-center mt-3">
-                                <p class="text-muted">...and more!</p>
+                                <p class="text-muted">...и многие другие!</p>
                             </div>
                         </div>
                     </div>
@@ -112,20 +112,20 @@
                 {% if bot_status == 'active' %}
                 <div class="alert alert-success text-center">
                     <p class="mb-0">
-                        <strong>Bot is active and ready!</strong> Search for <a href="https://t.me/GameDiscountTrackerBot" class="alert-link" target="_blank">@GameDiscountTrackerBot</a> on Telegram to start tracking game discounts.
+                        <strong>Бот активен и готов к работе!</strong> Найдите <a href="https://t.me/GameDiscountTrackerBot" class="alert-link" target="_blank">@GameDiscountTrackerBot</a> в Telegram, чтобы начать отслеживать скидки на игры.
                     </p>
                 </div>
                 {% else %}
                 <div class="alert alert-warning text-center">
                     <p class="mb-0">
-                        <strong>Bot is currently inactive.</strong> To activate the bot, you need to set the TELEGRAM_TOKEN environment variable.
+                        <strong>Бот в настоящее время неактивен.</strong> Для активации бота необходимо установить переменную окружения TELEGRAM_TOKEN.
                     </p>
                     <hr>
                     <p class="small mb-0">
-                        1. Create a bot with <a href="https://t.me/BotFather" class="alert-link" target="_blank">@BotFather</a> on Telegram<br>
-                        2. Copy your bot token<br>
-                        3. Set the TELEGRAM_TOKEN environment variable<br>
-                        4. Restart the application
+                        1. Создайте бота с помощью <a href="https://t.me/BotFather" class="alert-link" target="_blank">@BotFather</a> в Telegram<br>
+                        2. Скопируйте токен вашего бота<br>
+                        3. Установите переменную окружения TELEGRAM_TOKEN<br>
+                        4. Перезапустите приложение
                     </p>
                 </div>
                 {% endif %}
@@ -135,7 +135,7 @@
 
     <footer class="footer mt-auto py-3 bg-dark text-center">
         <div class="container">
-            <span class="text-muted">Game Discount Tracker Bot © 2023</span>
+            <span class="text-muted">Бот отслеживания скидок на игры © 2025</span>
         </div>
     </footer>
 </body>
