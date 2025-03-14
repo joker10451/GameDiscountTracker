@@ -42,11 +42,19 @@
                             </div>
                         </div>
                         
-                        <form>
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+
+                        <form method="POST" action="/settings">
                             <div class="mb-3">
                                 <label for="telegram_token" class="form-label">Telegram Bot Token</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="telegram_token" 
+                                    <input type="password" class="form-control" id="telegram_token" name="telegram_token"
                                            placeholder="Enter your Telegram Bot Token" 
                                            value="{{ telegram_token }}">
                                     <button class="btn btn-outline-secondary" type="button" 
@@ -68,13 +76,14 @@
                                     <li>Follow the instructions to name your bot</li>
                                     <li>Once created, BotFather will give you a token (like <code>123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ</code>)</li>
                                     <li>Copy this token and paste it in the field above</li>
-                                    <li>Set the token in your environment variables as <code>TELEGRAM_TOKEN</code></li>
-                                    <li>Restart the application</li>
                                 </ol>
                             </div>
                             
                             <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-primary" onclick="saveToken()">Save Token</button>
+                                <button type="submit" class="btn btn-primary">Save Token</button>
+                                {% if bot_status == 'active' %}
+                                <a href="/restart_bot" class="btn btn-secondary">Restart Bot</a>
+                                {% endif %}
                             </div>
                         </form>
                     </div>

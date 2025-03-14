@@ -36,14 +36,48 @@ def home():
     return render_template('index.html', bot_status=bot_status)
 
 # Settings route
-@app.route('/settings')
+@app.route('/settings', methods=['GET', 'POST'])
 def settings():
+    if request.method == 'POST':
+        # Handle token update
+        new_token = request.form.get('telegram_token')
+        if new_token:
+            # TODO: In a production environment, we would store this in a more secure way
+            # For this demo, we're using environment variables
+            os.environ['TELEGRAM_TOKEN'] = new_token
+            flash('Telegram token updated successfully. Restart the bot to apply changes.', 'success')
+            return redirect(url_for('restart_bot'))
+        else:
+            flash('Please provide a valid Telegram token.', 'error')
+    
     telegram_token = os.environ.get("TELEGRAM_TOKEN", "")
     # Mask the token for security if it exists
     masked_token = "•" * len(telegram_token) if telegram_token else ""
     return render_template('settings.html', 
                           telegram_token=masked_token,
                           bot_status="active" if telegram_token else "inactive")
+
+# Restart bot route
+@app.route('/restart_bot')
+def restart_bot():
+    global bot_thread
+    
+    # Check if thread is alive and terminate it if it is
+    if bot_thread and bot_thread.is_alive():
+        # We can't actually stop a running thread directly in Python
+        # This is just a placeholder - in a real application we would 
+        # implement a proper termination mechanism
+        logger.info("Terminating existing bot thread...")
+        # In a real application, we'd implement some signaling to the thread
+    
+    # Start a new bot thread
+    logger.info("Starting new bot thread...")
+    bot_thread = threading.Thread(target=run_bot)
+    bot_thread.daemon = True
+    bot_thread.start()
+    
+    flash('Bot restarted with new settings.', 'success')
+    return redirect(url_for('settings'))
 
 # Start the bot in a separate thread
 def run_bot():
