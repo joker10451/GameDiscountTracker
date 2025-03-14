@@ -13,12 +13,12 @@ logger = logging.getLogger(__name__)
 # CheapShark API URL
 CHEAPSHARK_API_URL = "https://www.cheapshark.com/api/1.0"
 
-async def check_price_updates() -> Dict[str, List[Dict[str, Any]]]:
+async def check_price_updates() -> Dict[str, Dict[str, Any]]:
     """
     Check price updates for all subscribed games
     
     Returns:
-        A dictionary with game_id as keys and list of users to notify as values
+        A dictionary with game_id as keys and game information (including users to notify) as values
     """
     logger.info("Checking price updates for subscribed games...")
     

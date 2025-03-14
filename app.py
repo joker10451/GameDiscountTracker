@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Flask, render_template, flash, redirect, url_for, request
-from bot.telegram_bot import start_bot
+from bot.telegram_bot import start_bot, run_bot as run_telegram_bot
 from services.scheduler import start_scheduler
 from models import db, User, Game, Subscription, PriceRecord, Store
 import threading
@@ -49,9 +49,13 @@ def settings():
 def run_bot():
     try:
         logger.info("Starting Telegram bot...")
-        bot = start_bot()
-        if bot is None:
+        # Initialize the bot with app context
+        bot_app = start_bot(app)
+        if bot_app is None:
             logger.warning("Telegram bot not started. Use the web interface to set up the bot.")
+        else:
+            # Run the bot with the initialized application
+            run_telegram_bot(bot_app)
     except Exception as e:
         logger.error(f"Error starting Telegram bot: {e}")
 
