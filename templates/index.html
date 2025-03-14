@@ -11,9 +11,16 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="text-center mb-5">
-                    <h1 class="display-4">🎮 Game Discount Tracker Bot</h1>
-                    <p class="lead">Track price drops for your favorite games across various digital stores!</p>
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <div>
+                        <h1 class="display-4">🎮 Game Discount Tracker Bot</h1>
+                        <p class="lead">Track price drops for your favorite games across various digital stores!</p>
+                    </div>
+                    <div>
+                        <a href="/settings" class="btn btn-outline-secondary">
+                            <i class="bi bi-gear"></i> Settings
+                        </a>
+                    </div>
                 </div>
 
                 <div class="card mb-4 bg-dark">
@@ -102,11 +109,26 @@
                     </div>
                 </div>
 
-                <div class="alert alert-info text-center">
+                {% if bot_status == 'active' %}
+                <div class="alert alert-success text-center">
                     <p class="mb-0">
-                        <strong>Start tracking game discounts today!</strong> Just search for <a href="https://t.me/GameDiscountTrackerBot" class="alert-link" target="_blank">@GameDiscountTrackerBot</a> on Telegram.
+                        <strong>Bot is active and ready!</strong> Search for <a href="https://t.me/GameDiscountTrackerBot" class="alert-link" target="_blank">@GameDiscountTrackerBot</a> on Telegram to start tracking game discounts.
                     </p>
                 </div>
+                {% else %}
+                <div class="alert alert-warning text-center">
+                    <p class="mb-0">
+                        <strong>Bot is currently inactive.</strong> To activate the bot, you need to set the TELEGRAM_TOKEN environment variable.
+                    </p>
+                    <hr>
+                    <p class="small mb-0">
+                        1. Create a bot with <a href="https://t.me/BotFather" class="alert-link" target="_blank">@BotFather</a> on Telegram<br>
+                        2. Copy your bot token<br>
+                        3. Set the TELEGRAM_TOKEN environment variable<br>
+                        4. Restart the application
+                    </p>
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>

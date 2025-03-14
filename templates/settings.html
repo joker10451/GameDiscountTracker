@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Game Discount Tracker Bot</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h1 class="h3">Settings</h1>
+                    <a href="/" class="btn btn-sm btn-outline-secondary">Back to Dashboard</a>
+                </div>
+
+                <div class="card mb-4 bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Bot Configuration</h5>
+                        
+                        <div class="alert alert-{{ 'success' if bot_status == 'active' else 'warning' }} mb-4">
+                            <div class="d-flex">
+                                <div class="me-3">
+                                    {% if bot_status == 'active' %}
+                                    <i class="bi bi-check-circle-fill fs-4"></i>
+                                    {% else %}
+                                    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <h6 class="alert-heading">Bot Status: {{ bot_status|capitalize }}</h6>
+                                    <p class="mb-0">
+                                        {% if bot_status == 'active' %}
+                                        The bot is running and ready to process commands.
+                                        {% else %}
+                                        The bot is not running. Please configure your Telegram Bot Token.
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <form>
+                            <div class="mb-3">
+                                <label for="telegram_token" class="form-label">Telegram Bot Token</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="telegram_token" 
+                                           placeholder="Enter your Telegram Bot Token" 
+                                           value="{{ telegram_token }}">
+                                    <button class="btn btn-outline-secondary" type="button" 
+                                            onclick="toggleTokenVisibility()" 
+                                            id="toggleVisibility">
+                                        Show
+                                    </button>
+                                </div>
+                                <div class="form-text">
+                                    Get this from <a href="https://t.me/BotFather" target="_blank">@BotFather</a> on Telegram
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info small">
+                                <h6 class="alert-heading">How to get a Telegram Bot Token:</h6>
+                                <ol class="mb-0">
+                                    <li>Open Telegram and search for <a href="https://t.me/BotFather" target="_blank">@BotFather</a></li>
+                                    <li>Send the command <code>/newbot</code> to create a new bot</li>
+                                    <li>Follow the instructions to name your bot</li>
+                                    <li>Once created, BotFather will give you a token (like <code>123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ</code>)</li>
+                                    <li>Copy this token and paste it in the field above</li>
+                                    <li>Set the token in your environment variables as <code>TELEGRAM_TOKEN</code></li>
+                                    <li>Restart the application</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-primary" onclick="saveToken()">Save Token</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="card mb-4 bg-dark">
+                    <div class="card-body">
+                        <h5 class="card-title">Price Check Settings</h5>
+                        <p class="card-text">The system is configured to check prices at the following intervals:</p>
+                        <ul class="list-group mb-3">
+                            <li class="list-group-item bg-dark d-flex justify-content-between">
+                                <span>Daily price check</span>
+                                <span>Midnight (00:00 UTC)</span>
+                            </li>
+                            <li class="list-group-item bg-dark d-flex justify-content-between">
+                                <span>Frequent price check</span>
+                                <span>Every 4 hours</span>
+                            </li>
+                        </ul>
+                        <p class="card-text small text-muted">These intervals can be adjusted in the server configuration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer mt-auto py-3 bg-dark text-center">
+        <div class="container">
+            <span class="text-muted">Game Discount Tracker Bot © 2023</span>
+        </div>
+    </footer>
+
+    <script>
+        function toggleTokenVisibility() {
+            const tokenInput = document.getElementById('telegram_token');
+            const toggleBtn = document.getElementById('toggleVisibility');
+            
+            if (tokenInput.type === 'password') {
+                tokenInput.type = 'text';
+                toggleBtn.textContent = 'Hide';
+            } else {
+                tokenInput.type = 'password';
+                toggleBtn.textContent = 'Show';
+            }
+        }
+        
+        function saveToken() {
+            const token = document.getElementById('telegram_token').value;
+            
+            // This is a placeholder - in a real application you would securely send this to the backend
+            alert('In a production environment, this would securely save the token and restart the bot.\n\nFor this demo, please manually set the TELEGRAM_TOKEN environment variable.');
+            
+            // You could implement a proper POST request here to securely save the token on the server side
+            // For security reasons, it's usually better to set this via environment variables
+        }
+    </script>
+</body>
+</html>
