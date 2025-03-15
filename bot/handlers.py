@@ -478,17 +478,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     """Обрабатывает текстовые сообщения от кнопок."""
     text = update.message.text
 
-    if text == '🔍 Поиск':
+    if text == '🔍 Поиск' or text == '🔍 Поиск игр':
         await update.message.reply_text(
-            "Введите название игры для поиска или выберите категорию:",
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🎮 Экшен", callback_data="search_action"),
-                 InlineKeyboardButton("🏃 Приключения", callback_data="search_adventure")],
-                [InlineKeyboardButton("🎲 RPG", callback_data="search_rpg"),
-                 InlineKeyboardButton("🏎️ Гонки", callback_data="search_racing")]
-            ])
+            "Введите название игры после команды /search\n"
+            "Например: /search Cyberpunk 2077"
         )
-    elif text == '💰 Скидки':
+    elif text == '💰 Скидки' or text == '💰 Текущие скидки':
         await check_discounts(update, context)
     elif text == '📋 Мои подписки':
         await list_subscriptions(update, context)
