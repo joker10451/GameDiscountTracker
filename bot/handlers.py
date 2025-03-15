@@ -30,43 +30,43 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             logger.error(f"Error saving user data: {e}")
     
     await update.message.reply_html(
-        f"Hi {user.mention_html()}! 👋\n\n"
-        "I'm a Game Discount Tracker Bot. I can help you track price drops for your favorite games "
-        "across various digital stores.\n\n"
-        "Use /help to see the list of available commands."
+        f"Привет, {user.mention_html()}! 👋\n\n"
+        "Я бот отслеживания скидок на игры. Я помогу тебе отслеживать снижение цен на твои любимые игры "
+        "в различных цифровых магазинах.\n\n"
+        "Используй команду /help, чтобы увидеть список доступных команд."
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send a message when the command /help is issued."""
     help_text = (
-        "Here are the commands you can use:\n\n"
-        "/search <game_name> - Search for a game\n"
-        "/subscribe <game_id> - Subscribe to price alerts for a game\n"
-        "/unsubscribe <game_id> - Unsubscribe from price alerts\n"
-        "/mysubs - List your subscribed games\n"
-        "/discounts - Show current discounts\n"
-        "/help - Show this help message"
+        "Вот команды, которые ты можешь использовать:\n\n"
+        "/search <название_игры> - Поиск игры\n"
+        "/subscribe <id_игры> - Подписаться на уведомления о цене\n"
+        "/unsubscribe <id_игры> - Отписаться от уведомлений\n"
+        "/mysubs - Показать список твоих подписок\n"
+        "/discounts - Показать текущие скидки\n"
+        "/help - Показать это сообщение"
     )
     await update.message.reply_text(help_text)
 
 async def search_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Search for games when the command /search is issued."""
     if not context.args:
-        await update.message.reply_text("Please provide a game name to search for. Example: /search Witcher 3")
+        await update.message.reply_text("Пожалуйста, укажите название игры для поиска. Пример: /search Witcher 3")
         return
     
     query = ' '.join(context.args)
-    await update.message.reply_text(f"Searching for: {query}...")
+    await update.message.reply_text(f"Ищу: {query}...")
     
     try:
         results = await search_game(query)
         
         if not results:
-            await update.message.reply_text(f"No games found for '{query}'. Please try a different search term.")
+            await update.message.reply_text(f"Не найдено игр по запросу '{query}'. Попробуйте другой поисковый запрос.")
             return
         
         # Create reply with inline buttons for each result
-        reply_text = "🎮 Search Results:\n\n"
+        reply_text = "🎮 Результаты поиска:\n\n"
         keyboard = []
         
         for idx, game in enumerate(results[:5]):  # Limit to 5 results to avoid message size limits
@@ -77,8 +77,8 @@ async def search_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             
             # Add button to subscribe and view details
             keyboard.append([
-                InlineKeyboardButton(f"Subscribe to {game_name}", callback_data=f"sub_{game_id}"),
-                InlineKeyboardButton(f"Details", callback_data=f"details_{game_id}")
+                InlineKeyboardButton(f"Подписаться на {game_name}", callback_data=f"sub_{game_id}"),
+                InlineKeyboardButton(f"Подробности", callback_data=f"details_{game_id}")
             ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -86,12 +86,12 @@ async def search_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         
     except Exception as e:
         logger.error(f"Error in search_games: {e}")
-        await update.message.reply_text(f"Sorry, there was an error while searching. Please try again later.")
+        await update.message.reply_text(f"Извините, произошла ошибка при поиске. Пожалуйста, попробуйте позже.")
 
 async def subscribe_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Subscribe to price alerts for a game."""
     if not context.args:
-        await update.message.reply_text("Please provide a game ID to subscribe to. Use /search to find game IDs.")
+        await update.message.reply_text("Пожалуйста, укажите ID игры, на которую хотите подписаться. Используйте /search для поиска ID игр.")
         return
     
     game_id = context.args[0]
@@ -102,7 +102,7 @@ async def subscribe_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         game_details = await get_game_details(game_id)
         
         if not game_details:
-            await update.message.reply_text(f"Game with ID {game_id} not found. Please check the ID and try again.")
+            await update.message.reply_text(f"Игра с ID {game_id} не найдена. Пожалуйста, проверьте ID и попробуйте снова.")
             return
         
         # Add subscription with app context
@@ -113,20 +113,20 @@ async def subscribe_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
             if success:
                 await update.message.reply_text(
-                    f"✅ You are now subscribed to price alerts for {game_details.get('name')}.\n"
-                    f"I'll notify you when the price drops!"
+                    f"✅ Вы подписались на уведомления о цене для игры {game_details.get('name')}.\n"
+                    f"Я уведомлю вас, когда цена снизится!"
                 )
             else:
-                await update.message.reply_text(f"You're already subscribed to this game.")
+                await update.message.reply_text(f"Вы уже подписаны на эту игру.")
             
     except Exception as e:
         logger.error(f"Error in subscribe_game: {e}")
-        await update.message.reply_text("Sorry, there was an error while subscribing. Please try again later.")
+        await update.message.reply_text("Извините, произошла ошибка при подписке. Пожалуйста, попробуйте позже.")
 
 async def unsubscribe_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Unsubscribe from price alerts for a game."""
     if not context.args:
-        await update.message.reply_text("Please provide a game ID to unsubscribe from. Use /mysubs to see your subscriptions.")
+        await update.message.reply_text("Пожалуйста, укажите ID игры, от которой хотите отписаться. Используйте /mysubs, чтобы увидеть ваши подписки.")
         return
     
     game_id = context.args[0]
@@ -138,13 +138,13 @@ async def unsubscribe_game(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             success, game_name = remove_subscription(user_id, game_id)
         
             if success:
-                await update.message.reply_text(f"✅ You have unsubscribed from price alerts for {game_name}.")
+                await update.message.reply_text(f"✅ Вы отписались от уведомлений о цене для игры {game_name}.")
             else:
-                await update.message.reply_text("You're not subscribed to this game.")
+                await update.message.reply_text("Вы не подписаны на эту игру.")
             
     except Exception as e:
         logger.error(f"Error in unsubscribe_game: {e}")
-        await update.message.reply_text("Sorry, there was an error while unsubscribing. Please try again later.")
+        await update.message.reply_text("Извините, произошла ошибка при отписке. Пожалуйста, попробуйте позже.")
 
 async def list_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """List all subscribed games for the user."""
@@ -157,12 +157,12 @@ async def list_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE)
         
             if not subscriptions:
                 await update.message.reply_text(
-                    "You don't have any game subscriptions yet.\n"
-                    "Use /search to find games and subscribe to them!"
+                    "У вас пока нет подписок на игры.\n"
+                    "Используйте /search для поиска игр и подписки на них!"
                 )
                 return
             
-            reply_text = "🎮 Your Game Subscriptions:\n\n"
+            reply_text = "🎮 Ваши подписки на игры:\n\n"
             keyboard = []
             
             for game_id, game_info in subscriptions.items():
@@ -171,7 +171,7 @@ async def list_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 
                 # Add button to unsubscribe
                 keyboard.append([
-                    InlineKeyboardButton(f"Unsubscribe from {game_name}", callback_data=f"unsub_{game_id}")
+                    InlineKeyboardButton(f"Отписаться от {game_name}", callback_data=f"unsub_{game_id}")
                 ])
             
             reply_markup = InlineKeyboardMarkup(keyboard)
@@ -179,38 +179,38 @@ async def list_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE)
         
     except Exception as e:
         logger.error(f"Error in list_subscriptions: {e}")
-        await update.message.reply_text("Sorry, there was an error retrieving your subscriptions. Please try again later.")
+        await update.message.reply_text("Извините, произошла ошибка при получении ваших подписок. Пожалуйста, попробуйте позже.")
 
 async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show current game discounts."""
-    await update.message.reply_text("Checking current game discounts... This might take a moment.")
+    await update.message.reply_text("Проверяю текущие скидки на игры... Это может занять некоторое время.")
     
     try:
         discounts = await get_current_discounts()
         
         if not discounts:
-            await update.message.reply_text("No notable discounts found at the moment. Check back later!")
+            await update.message.reply_text("В данный момент не найдено значительных скидок. Загляните позже!")
             return
         
-        reply_text = "🔥 Current Hot Deals:\n\n"
+        reply_text = "🔥 Текущие горячие предложения:\n\n"
         keyboard = []
         
         for game in discounts[:10]:  # Limit to 10 games to avoid message size limits
             game_id = game.get('id')
             game_name = game.get('name')
             discount = game.get('discount_percent', 0)
-            current_price = game.get('price_current', 'Unknown')
-            original_price = game.get('price_original', 'Unknown')
-            store = game.get('store', 'Unknown Store')
+            current_price = game.get('price_current', 'Неизвестно')
+            original_price = game.get('price_original', 'Неизвестно')
+            store = game.get('store', 'Неизвестный магазин')
             
             reply_text += (f"🎮 {game_name}\n"
-                         f"💰 {current_price} (was {original_price}, -{discount}%)\n"
+                         f"💰 {current_price} (было {original_price}, -{discount}%)\n"
                          f"🏪 {store}\n\n")
             
             # Add button to subscribe
             keyboard.append([
-                InlineKeyboardButton(f"Subscribe to {game_name}", callback_data=f"sub_{game_id}"),
-                InlineKeyboardButton(f"Details", callback_data=f"details_{game_id}")
+                InlineKeyboardButton(f"Подписаться на {game_name}", callback_data=f"sub_{game_id}"),
+                InlineKeyboardButton(f"Подробности", callback_data=f"details_{game_id}")
             ])
         
         reply_markup = InlineKeyboardMarkup(keyboard)
@@ -218,7 +218,7 @@ async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         
     except Exception as e:
         logger.error(f"Error in check_discounts: {e}")
-        await update.message.reply_text("Sorry, there was an error retrieving current discounts. Please try again later.")
+        await update.message.reply_text("Извините, произошла ошибка при получении текущих скидок. Пожалуйста, попробуйте позже.")
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle button presses from inline keyboards."""
@@ -236,22 +236,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             game_details = await get_game_details(game_id)
             
             if not game_details:
-                await query.edit_message_text(text=f"Game with ID {game_id} not found. Please try another game.")
+                await query.edit_message_text(text=f"Игра с ID {game_id} не найдена. Пожалуйста, попробуйте другую игру.")
                 return
             
             # Add subscription with app context
             with current_app.app_context():
                 # Get thumbnail if available
                 thumbnail = game_details.get('thumbnail', None)
-                success = add_subscription(user_id, game_id, game_details.get('name', 'Unknown Game'), thumbnail)
+                success = add_subscription(user_id, game_id, game_details.get('name', 'Неизвестная игра'), thumbnail)
             
                 if success:
                     await query.edit_message_text(
-                        text=f"✅ You are now subscribed to price alerts for {game_details.get('name')}.\n"
-                             f"I'll notify you when the price drops!"
+                        text=f"✅ Вы подписались на уведомления о цене для игры {game_details.get('name')}.\n"
+                             f"Я уведомлю вас, когда цена снизится!"
                     )
                 else:
-                    await query.edit_message_text(text=f"You're already subscribed to this game.")
+                    await query.edit_message_text(text=f"Вы уже подписаны на эту игру.")
                 
         elif data.startswith('unsub_'):
             game_id = data[6:]
@@ -262,9 +262,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 success, game_name = remove_subscription(user_id, game_id)
             
                 if success:
-                    await query.edit_message_text(text=f"✅ You have unsubscribed from price alerts for {game_name}.")
+                    await query.edit_message_text(text=f"✅ Вы отписались от уведомлений о цене для игры {game_name}.")
                 else:
-                    await query.edit_message_text(text="You're not subscribed to this game.")
+                    await query.edit_message_text(text="Вы не подписаны на эту игру.")
                 
         elif data.startswith('details_'):
             game_id = data[8:]
@@ -273,11 +273,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             game_details = await get_game_details(game_id)
             
             if not game_details:
-                await query.edit_message_text(text=f"Game with ID {game_id} not found. Please try another game.")
+                await query.edit_message_text(text=f"Игра с ID {game_id} не найдена. Пожалуйста, попробуйте другую игру.")
                 return
             
             # Format game details message
-            game_name = game_details.get('name', 'Unknown Game')
+            game_name = game_details.get('name', 'Неизвестная игра')
             stores = game_details.get('stores', [])
             prices = game_details.get('prices', {})
             
@@ -290,27 +290,27 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     description = description[:197] + "..."
                 details_text += f"📝 {description}\n\n"
             
-            details_text += "💰 Prices:\n"
+            details_text += "💰 Цены:\n"
             
             for store_name, price_info in prices.items():
-                current_price = price_info.get('current', 'Unknown')
-                original_price = price_info.get('original', 'Unknown')
+                current_price = price_info.get('current', 'Неизвестно')
+                original_price = price_info.get('original', 'Неизвестно')
                 discount = price_info.get('discount_percent', 0)
                 
                 if discount > 0:
-                    details_text += f"🏪 {store_name}: {current_price} (was {original_price}, -{discount}%)\n"
+                    details_text += f"🏪 {store_name}: {current_price} (было {original_price}, -{discount}%)\n"
                 else:
                     details_text += f"🏪 {store_name}: {current_price}\n"
             
             # Add button to subscribe
-            keyboard = [[InlineKeyboardButton(f"Subscribe to {game_name}", callback_data=f"sub_{game_id}")]]
+            keyboard = [[InlineKeyboardButton(f"Подписаться на {game_name}", callback_data=f"sub_{game_id}")]]
             reply_markup = InlineKeyboardMarkup(keyboard)
             
             await query.edit_message_text(text=details_text, reply_markup=reply_markup)
             
     except Exception as e:
         logger.error(f"Error in button_handler: {e}")
-        await query.edit_message_text(text="Sorry, there was an error processing your request. Please try again later.")
+        await query.edit_message_text(text="Извините, произошла ошибка при обработке вашего запроса. Пожалуйста, попробуйте позже.")
 
 async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log errors caused by updates."""
@@ -318,4 +318,4 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     
     # Notify user of error
     if update.effective_message:
-        await update.effective_message.reply_text("Sorry, something went wrong. Please try again later.")
+        await update.effective_message.reply_text("Извините, что-то пошло не так. Пожалуйста, попробуйте позже.")
