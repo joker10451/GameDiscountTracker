@@ -30,12 +30,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             logger.error(f"Ошибка сохранения данных пользователя: {e}")
 
     # Создаем клавиатуру с кнопками
-    keyboard = [
-        [KeyboardButton("🔍 Поиск игр"), KeyboardButton("💰 Текущие скидки")],
-        [KeyboardButton("📋 Мои подписки"), KeyboardButton("⚙️ Настройки")],
-        [KeyboardButton("❓ Помощь")]
-    ]
-    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+    reply_markup = ReplyKeyboardMarkup([
+        ['🔍 Поиск', '💰 Скидки', '🎮 Топ игр'],
+        ['📋 Мои подписки', '⚙️ Настройки', '❓ Помощь'],
+        ['📊 Статистика', '🏷️ Фильтры цен']
+    ], resize_keyboard=True)
 
     await update.message.reply_html(
         f"🎮 Привет, {user.mention_html()}! 👋\n\n"
@@ -479,22 +478,39 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     """Обрабатывает текстовые сообщения от кнопок."""
     text = update.message.text
 
-    if text == "🔍 Поиск игр":
+    if text == '🔍 Поиск':
         await update.message.reply_text(
-            "Введите название игры для поиска:\n"
-            "Например: /search Minecraft"
+            "Введите название игры для поиска или выберите категорию:",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🎮 Экшен", callback_data="search_action"),
+                 InlineKeyboardButton("🏃 Приключения", callback_data="search_adventure")],
+                [InlineKeyboardButton("🎲 RPG", callback_data="search_rpg"),
+                 InlineKeyboardButton("🏎️ Гонки", callback_data="search_racing")]
+            ])
         )
-    elif text == "💰 Текущие скидки":
+    elif text == '💰 Скидки':
         await check_discounts(update, context)
-    elif text == "📋 Мои подписки":
+    elif text == '📋 Мои подписки':
         await list_subscriptions(update, context)
-    elif text == "⚙️ Настройки":
-        keyboard = [
-            [InlineKeyboardButton("Фильтр по цене", callback_data="set_price_filter")],
-            [InlineKeyboardButton("Фильтр по скидке", callback_data="set_discount_filter")],
-            [InlineKeyboardButton("Сбросить фильтры", callback_data="clear_filters")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("⚙️ Настройки:", reply_markup=reply_markup)
-    elif text == "❓ Помощь":
+    elif text == '❓ Помощь':
         await help_command(update, context)
+    elif text == '🎮 Топ игр':
+        await show_top_games(update, context) # Placeholder function
+    elif text == '⚙️ Настройки':
+        await show_settings(update, context) # Placeholder function
+    elif text == '📊 Статистика':
+        await show_stats(update, context) # Placeholder function
+    elif text == '🏷️ Фильтры цен':
+        await show_price_filters(update, context) # Placeholder function
+
+async def show_top_games(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Функция 'Топ игр' пока не реализована.")
+
+async def show_settings(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Функция 'Настройки' пока не реализована.")
+
+async def show_stats(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Функция 'Статистика' пока не реализована.")
+
+async def show_price_filters(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Функция 'Фильтры цен' пока не реализована.")
