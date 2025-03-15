@@ -18,6 +18,10 @@ async def search_game(
     genre: Optional[str] = None,
     publisher: Optional[str] = None
 ) -> List[Dict[str, Any]]:
+    if not query:
+        return []
+        
+    logger.info(f"Searching for game: {query}")
     """
     Search for games using the CheapShark API with filters
     

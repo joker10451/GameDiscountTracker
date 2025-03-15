@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "default-secret-key")
 
 # Configure database
-app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL")
+app.config["SQLALCHEMY_DATABASE_URI"] = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@localhost:5432/gamebot")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
@@ -49,7 +49,7 @@ def settings():
             return redirect(url_for('restart_bot'))
         else:
             flash('Please provide a valid Telegram token.', 'error')
-    
+
     telegram_token = os.environ.get("TELEGRAM_TOKEN", "")
     # Mask the token for security if it exists
     masked_token = "•" * len(telegram_token) if telegram_token else ""
@@ -61,7 +61,7 @@ def settings():
 @app.route('/restart_bot')
 def restart_bot():
     global bot_thread
-    
+
     # Check if thread is alive and terminate it if it is
     if bot_thread and bot_thread.is_alive():
         # We can't actually stop a running thread directly in Python
@@ -69,13 +69,13 @@ def restart_bot():
         # implement a proper termination mechanism
         logger.info("Terminating existing bot thread...")
         # In a real application, we'd implement some signaling to the thread
-    
+
     # Start a new bot thread
     logger.info("Starting new bot thread...")
     bot_thread = threading.Thread(target=run_bot)
     bot_thread.daemon = True
     bot_thread.start()
-    
+
     flash('Bot restarted with new settings.', 'success')
     return redirect(url_for('settings'))
 
