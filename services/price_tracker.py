@@ -131,8 +131,8 @@ async def send_price_drop_notifications(price_drops: Dict[str, Dict[str, Any]]) 
             price_info = game_info.get('price_info', {})
             
             # Create notification message
-            message = f"🔥 Price Drop Alert! 🔥\n\n"
-            message += f"Game: {game_name}\n\n"
+            message = f"🔥 Снижение цены! 🔥\n\n"
+            message += f"Игра: {game_name}\n\n"
             
             for store_name, store_price_info in price_info.items():
                 current_price = store_price_info.get('current_price', 'Unknown')
@@ -147,7 +147,7 @@ async def send_price_drop_notifications(price_drops: Dict[str, Dict[str, Any]]) 
                     message += f"🏪 {store_name}: {current_price} (was {original_price}, -{discount}%)\n"
             
             # Add a call to action
-            message += f"\nUse /search {game_name} to get more details!"
+            message += f"\nИспользуйте /search {game_name} чтобы узнать подробности!"
             
             # Send to each subscribed user
             for user_id in users:
