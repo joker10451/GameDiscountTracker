@@ -160,12 +160,18 @@ async def send_price_drop_notifications(price_drops: Dict[str, Dict[str, Any]]) 
     except Exception as e:
         logger.error(f"Error sending price drop notifications: {e}")
 
-async def get_current_discounts(limit: int = 20) -> List[Dict[str, Any]]:
+async def get_current_discounts(
+    limit: int = 20,
+    max_price: Optional[float] = None,
+    min_discount: Optional[int] = None
+) -> List[Dict[str, Any]]:
     """
     Get current discounted games from CheapShark API
     
     Args:
         limit: Maximum number of deals to return
+        max_price: Maximum price filter
+        min_discount: Minimum discount percentage filter
         
     Returns:
         A list of discounted games
@@ -185,6 +191,15 @@ async def get_current_discounts(limit: int = 20) -> List[Dict[str, Any]]:
                 # Format the response to our standard format
                 results = []
                 for deal in data:
+                    # Apply price and discount filters
+                    sale_price = float(deal.get('salePrice', 0))
+                    savings = float(deal.get('savings', 0))
+                    
+                    if max_price and sale_price > max_price:
+                        continue
+                    if min_discount and savings < min_discount:
+                        continue
+                    
                     # Get store name
                     store_id = deal.get('storeID')
                     store_url = f"{CHEAPSHARK_API_URL}/stores"

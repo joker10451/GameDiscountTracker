@@ -45,6 +45,9 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         "/unsubscribe <id_игры> - Отписаться от уведомлений\n"
         "/mysubs - Показать список твоих подписок\n"
         "/discounts - Показать текущие скидки\n"
+        "/filter price <макс_цена> - Установить фильтр по цене\n"
+        "/filter discount <мин_скидка> - Установить фильтр по скидке\n"
+        "/filter clear - Сбросить все фильтры\n"
         "/help - Показать это сообщение"
     )
     await update.message.reply_text(help_text)
@@ -186,7 +189,13 @@ async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await update.message.reply_text("Проверяю текущие скидки на игры... Это может занять некоторое время.")
     
     try:
-        discounts = await get_current_discounts()
+        max_price = context.user_data.get('max_price')
+        min_discount = context.user_data.get('min_discount')
+        
+        discounts = await get_current_discounts(
+            max_price=max_price,
+            min_discount=min_discount
+        )
         
         if not discounts:
             await update.message.reply_text("В данный момент не найдено значительных скидок. Загляните позже!")
@@ -319,3 +328,48 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     # Notify user of error
     if update.effective_message:
         await update.effective_message.reply_text("Извините, что-то пошло не так. Пожалуйста, попробуйте позже.")
+
+
+async def handle_filters(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle price and discount filters"""
+    if not context.args or len(context.args) < 1:
+        await update.message.reply_text(
+            "Используйте:\n"
+            "/filter price <макс_цена> - Установить максимальную цену\n"
+            "/filter discount <процент> - Установить минимальную скидку\n"
+            "/filter clear - Сбросить фильтры"
+        )
+        return
+
+    filter_type = context.args[0].lower()
+    
+    if filter_type == "clear":
+        context.user_data.clear()
+        await update.message.reply_text("✅ Все фильтры сброшены")
+        return
+        
+    if len(context.args) < 2:
+        await update.message.reply_text("Пожалуйста, укажите значение для фильтра")
+        return
+
+    try:
+        value = float(context.args[1])
+        if filter_type == "price":
+            if value <= 0:
+                await update.message.reply_text("Цена должна быть больше 0")
+                return
+            context.user_data['max_price'] = value
+            await update.message.reply_text(f"✅ Установлен фильтр по цене: до ${value:.2f}")
+            
+        elif filter_type == "discount":
+            if not 0 <= value <= 100:
+                await update.message.reply_text("Скидка должна быть от 0 до 100%")
+                return
+            context.user_data['min_discount'] = value
+            await update.message.reply_text(f"✅ Установлен фильтр по скидке: от {value}%")
+            
+        else:
+            await update.message.reply_text("Неизвестный тип фильтра. Используйте 'price' или 'discount'")
+            
+    except ValueError:
+        await update.message.reply_text("Пожалуйста, укажите числовое значение")
