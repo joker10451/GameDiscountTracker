@@ -43,6 +43,9 @@ def start_bot(app=None):
         # Add callback query handler for inline buttons
         application.add_handler(CallbackQueryHandler(button_handler))
         
+        # Add message handler for keyboard buttons
+        application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+        
         # Add error handler
         application.add_error_handler(error_handler)
         

@@ -1,6 +1,6 @@
 import logging
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import ContextTypes
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
+from telegram.ext import ContextTypes, MessageHandler, filters
 from services.game_service import search_game, get_game_details, get_similar_games, get_price_history
 from services.price_tracker import get_current_discounts
 from data.data_manager import add_subscription, remove_subscription, get_user_subscriptions, update_user_info
@@ -29,6 +29,14 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         except Exception as e:
             logger.error(f"Ошибка сохранения данных пользователя: {e}")
 
+    # Создаем клавиатуру с кнопками
+    keyboard = [
+        [KeyboardButton("🔍 Поиск игр"), KeyboardButton("💰 Текущие скидки")],
+        [KeyboardButton("📋 Мои подписки"), KeyboardButton("⚙️ Настройки")],
+        [KeyboardButton("❓ Помощь")]
+    ]
+    reply_markup = ReplyKeyboardMarkup(keyboard, resize_keyboard=True)
+
     await update.message.reply_html(
         f"🎮 Привет, {user.mention_html()}! 👋\n\n"
         "Я твой персональный помощник по поиску скидок на игры!\n\n"
@@ -38,8 +46,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         "• Уведомлять о снижении цен\n"
         "• Показывать историю цен\n"
         "• Находить похожие игры\n\n"
-        "📝 Используй /help для просмотра всех команд\n"
-        "🎯 Начни с команды /search для поиска игр"
+        "Используйте кнопки меню для навигации 👇",
+        reply_markup=reply_markup
     )
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -467,3 +475,26 @@ async def price_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     except Exception as e:
         logger.error(f"Ошибка в price_history: {e}")
         await update.message.reply_text("Извините, произошла ошибка при получении истории цен.")
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Обрабатывает текстовые сообщения от кнопок."""
+    text = update.message.text
+
+    if text == "🔍 Поиск игр":
+        await update.message.reply_text(
+            "Введите название игры для поиска:\n"
+            "Например: /search Minecraft"
+        )
+    elif text == "💰 Текущие скидки":
+        await check_discounts(update, context)
+    elif text == "📋 Мои подписки":
+        await list_subscriptions(update, context)
+    elif text == "⚙️ Настройки":
+        keyboard = [
+            [InlineKeyboardButton("Фильтр по цене", callback_data="set_price_filter")],
+            [InlineKeyboardButton("Фильтр по скидке", callback_data="set_discount_filter")],
+            [InlineKeyboardButton("Сбросить фильтры", callback_data="clear_filters")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text("⚙️ Настройки:", reply_markup=reply_markup)
+    elif text == "❓ Помощь":
+        await help_command(update, context)
