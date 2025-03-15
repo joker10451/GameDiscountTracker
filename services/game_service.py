@@ -9,8 +9,10 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# In a real-world scenario, you would use actual API keys for these services
-# For this example, we'll simulate using the CheapShark API which doesn't require an API key
+# Import store information
+from services.price_tracker import SUPPORTED_STORES
+
+# CheapShark API URL
 CHEAPSHARK_API_URL = "https://www.cheapshark.com/api/1.0"
 
 async def search_game(
