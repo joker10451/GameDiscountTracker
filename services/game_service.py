@@ -135,20 +135,7 @@ async def get_store_name(session: aiohttp.ClientSession, store_id: str) -> Optio
         The store name or None if not found
     """
     try:
-        stores_url = f"{CHEAPSHARK_API_URL}/stores"
-        
-        async with session.get(stores_url) as response:
-            if response.status != 200:
-                logger.error(f"API request failed with status {response.status}")
-                return None
-            
-            stores = await response.json()
-            
-            for store in stores:
-                if store.get('storeID') == store_id:
-                    return store.get('storeName')
-            
-            return "Unknown Store"
+        return SUPPORTED_STORES.get(store_id, "Unknown Store")
     except Exception as e:
         logger.error(f"Error getting store name: {e}")
         return "Unknown Store"
