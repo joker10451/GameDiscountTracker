@@ -2,7 +2,40 @@
 __pycache__/
 *.py[cod]
 *$py.class
-*.so
+
+# Environment
+.env
+
+# Database
+instance/
+*.db
+*.sqlite3
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# Replit specific
+.replit
+.upm/
+.config/
+.cache/
+replit.nix
+uv.lock
+
+# Logs
+*.log
+
+# Virtual Environment
+venv/
+ENV/
+
+# IDE files
+*.swo
+
+
+# Python (from original, not explicitly replaced)
 .Python
 env/
 build/
@@ -20,30 +53,4 @@ var/
 .installed.cfg
 *.egg
 
-# Virtual Environment
-venv/
-ENV/
-
-# IDE files
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Logs
-logs/
-*.log
-
-# Database
-*.sqlite3
-*.db
-
-# Replit specific
-.replit
-.upm/
-.config/
-.gitattributes
-.cache/
-
-# Environment variables (for security)
-.env
+*.so
