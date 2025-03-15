@@ -1,4 +1,5 @@
 
+import os
 from app import app, bot_thread, scheduler_thread
 
 if __name__ == "__main__":
@@ -9,4 +10,5 @@ if __name__ == "__main__":
         scheduler_thread.start()
         
     # Run Flask app
-    app.run(host="0.0.0.0", port=5000, debug=True)
+    port = os.getenv('PORT', 5000)
+    app.run(host="0.0.0.0", port=port)
