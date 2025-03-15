@@ -1,7 +1,7 @@
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ContextTypes
-from services.game_service import search_game, get_game_details
+from services.game_service import search_game, get_game_details, get_similar_games, get_price_history
 from services.price_tracker import get_current_discounts
 from data.data_manager import add_subscription, remove_subscription, get_user_subscriptions, update_user_info
 from flask import current_app
@@ -206,7 +206,7 @@ async def list_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Показывает текущие скидки на игры."""
-    await update.message.reply_text("Проверяю текущие скидки на игры... Это может занять некоторое время.")
+    progress_msg = await update.message.reply_text("🔍 Ищу лучшие предложения для вас...")
 
     try:
         max_price = context.user_data.get('max_price')
@@ -218,13 +218,13 @@ async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         )
 
         if not discounts:
-            await update.message.reply_text("В данный момент не найдено значительных скидок. Загляните позже!")
+            await progress_msg.edit_text("😔 Сейчас нет интересных скидок.\n\n💡 Включите уведомления (/mysubs), чтобы не пропустить выгодные предложения!")
             return
 
-        reply_text = "🔥 Текущие горячие предложения:\n\n"
+        reply_text = "🌟 ЛУЧШИЕ ПРЕДЛОЖЕНИЯ СЕГОДНЯ 🌟\n\n"
         keyboard = []
 
-        for game in discounts[:10]:  # Ограничение до 10 игр, чтобы избежать ограничения размера сообщения
+        for game in discounts[:10]:
             game_id = game.get('id')
             game_name = game.get('name')
             discount = game.get('discount_percent', 0)
@@ -232,9 +232,16 @@ async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             original_price = game.get('price_original', 'Неизвестно')
             store = game.get('store', 'Неизвестный магазин')
 
-            reply_text += (f"🎮 {game_name}\n"
-                         f"💰 {current_price} (было {original_price}, -{discount}%)\n"
-                         f"🏪 {store}\n\n")
+            # Добавляем звездочки для больших скидок
+            discount_stars = "⭐️" * (discount // 25) if discount >= 25 else ""
+
+            reply_text += (
+                f"〔 {game_name} 〕{discount_stars}\n"
+                f"┌ 💰 Сейчас: {current_price}\n"
+                f"├ 📈 Было: {original_price}\n"
+                f"├ 🔥 Скидка: -{discount}%\n"
+                f"└ 🏪 Магазин: {store}\n\n"
+            )
 
             # Добавляет кнопку для подписки
             keyboard.append([
@@ -243,11 +250,11 @@ async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             ])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(reply_text, reply_markup=reply_markup)
+        await progress_msg.edit_text(reply_text, reply_markup=reply_markup)
 
     except Exception as e:
         logger.error(f"Ошибка в check_discounts: {e}")
-        await update.message.reply_text("Извините, произошла ошибка при получении текущих скидок. Пожалуйста, попробуйте позже.")
+        await progress_msg.edit_text("Извините, произошла ошибка при получении текущих скидок. Пожалуйста, попробуйте позже.")
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Обрабатывает нажатия кнопок из инлайн-клавиатур."""
@@ -404,7 +411,7 @@ async def similar_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     try:
         similar = await get_similar_games(game_id)
-        
+
         if not similar:
             await update.message.reply_text("Не удалось найти похожие игры.")
             return
@@ -441,7 +448,7 @@ async def price_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     try:
         history = await get_price_history(game_id)
         game_details = await get_game_details(game_id)
-        
+
         if not history or not game_details:
             await update.message.reply_text("Не удалось получить историю цен.")
             return
