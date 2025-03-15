@@ -9,7 +9,7 @@ deploymentTarget = "autoscale"
 run = ["sh", "-c", "python undefined"]
 
 [workflows]
-runButton = "Project"
+runButton = "Start Bot"
 
 [[workflows.workflow]]
 name = "Project"
@@ -34,6 +34,15 @@ task = "packager.installForAll"
 task = "shell.exec"
 args = "gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app"
 waitForPort = 5000
+
+[[workflows.workflow]]
+name = "Start Bot"
+author = 40513802
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "gunicorn --bind 0.0.0.0:5000 --workers 1 --threads 8 main:app"
 
 [[ports]]
 localPort = 5000
