@@ -13,12 +13,18 @@ logger = logging.getLogger(__name__)
 # For this example, we'll simulate using the CheapShark API which doesn't require an API key
 CHEAPSHARK_API_URL = "https://www.cheapshark.com/api/1.0"
 
-async def search_game(query: str) -> List[Dict[str, Any]]:
+async def search_game(
+    query: str,
+    genre: Optional[str] = None,
+    publisher: Optional[str] = None
+) -> List[Dict[str, Any]]:
     """
-    Search for games using the CheapShark API
+    Search for games using the CheapShark API with filters
     
     Args:
         query: The game title to search for
+        genre: Filter by genre
+        publisher: Filter by publisher
         
     Returns:
         A list of game results with id, title, and thumbnail
@@ -142,3 +148,79 @@ async def get_store_name(session: aiohttp.ClientSession, store_id: str) -> Optio
     except Exception as e:
         logger.error(f"Error getting store name: {e}")
         return "Unknown Store"
+async def get_similar_games(game_id: str) -> List[Dict[str, Any]]:
+    """
+    Get similar games based on genre and tags
+    
+    Args:
+        game_id: ID of the game to find similar ones for
+        
+    Returns:
+        List of similar games
+    """
+    try:
+        game_details = await get_game_details(game_id)
+        if not game_details:
+            return []
+            
+        genre = game_details.get('info', {}).get('genre')
+        if not genre:
+            return []
+            
+        async with aiohttp.ClientSession() as session:
+            search_url = f"{CHEAPSHARK_API_URL}/games?title={genre}&limit=5"
+            async with session.get(search_url) as response:
+                if response.status != 200:
+                    return []
+                    
+                data = await response.json()
+                return [
+                    {
+                        'id': game.get('gameID'),
+                        'name': game.get('external'),
+                        'thumbnail': game.get('thumb'),
+                        'cheapest_price': game.get('cheapest')
+                    }
+                    for game in data 
+                    if game.get('gameID') != game_id
+                ]
+    except Exception as e:
+        logger.error(f"Error getting similar games: {e}")
+        return []
+
+async def get_price_history(game_id: str) -> Dict[str, Any]:
+    """
+    Get historical price data for a game
+    
+    Args:
+        game_id: Game ID to get price history for
+        
+    Returns:
+        Dictionary with price history data
+    """
+    try:
+        async with aiohttp.ClientSession() as session:
+            url = f"{CHEAPSHARK_API_URL}/games?id={game_id}"
+            async with session.get(url) as response:
+                if response.status != 200:
+                    return {}
+                    
+                data = await response.json()
+                deals = data.get('deals', [])
+                
+                # Форматируем данные для построения графика
+                price_history = {
+                    'dates': [],
+                    'prices': [],
+                    'stores': []
+                }
+                
+                for deal in deals:
+                    price_history['dates'].append(deal.get('lastChange'))
+                    price_history['prices'].append(float(deal.get('price')))
+                    price_history['stores'].append(await get_store_name(session, deal.get('storeID')))
+                
+                return price_history
+    except Exception as e:
+        logger.error(f"Error getting price history: {e}")
+        return {}

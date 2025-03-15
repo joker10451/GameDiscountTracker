@@ -41,6 +41,10 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     help_text = (
         "Вот команды, которые ты можешь использовать:\n\n"
         "/search <название_игры> - Поиск игры\n"
+        "/search genre <жанр> <название> - Поиск по жанру\n"
+        "/search publisher <издатель> <название> - Поиск по издателю\n"
+        "/similar <id_игры> - Поиск похожих игр\n"
+        "/history <id_игры> - История цен\n"
         "/subscribe <id_игры> - Подписаться на уведомления о цене\n"
         "/unsubscribe <id_игры> - Отписаться от уведомлений\n"
         "/mysubs - Показать список твоих подписок\n"
@@ -55,7 +59,14 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 async def search_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Ищет игры при команде /search."""
     if not context.args:
-        await update.message.reply_text("Пожалуйста, укажите название игры для поиска. Пример: /search Witcher 3")
+        await update.message.reply_text(
+            "Используйте следующие команды для поиска:\n"
+            "/search <название> - Поиск по названию\n"
+            "/search genre <жанр> <название> - Поиск по жанру\n"
+            "/search publisher <издатель> <название> - Поиск по издателю\n"
+            "/similar <id_игры> - Поиск похожих игр\n"
+            "/history <id_игры> - История цен"
+        )
         return
 
     query = ' '.join(context.args)
@@ -373,3 +384,70 @@ async def handle_filters(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     except ValueError:
         await update.message.reply_text("Пожалуйста, укажите числовое значение")
+async def similar_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Показывает похожие игры."""
+    if not context.args:
+        await update.message.reply_text("Пожалуйста, укажите ID игры для поиска похожих. Пример: /similar 12345")
+        return
+
+    game_id = context.args[0]
+    await update.message.reply_text("Ищу похожие игры...")
+
+    try:
+        similar = await get_similar_games(game_id)
+        
+        if not similar:
+            await update.message.reply_text("Не удалось найти похожие игры.")
+            return
+
+        reply_text = "🎮 Похожие игры:\n\n"
+        keyboard = []
+
+        for game in similar:
+            game_id = game.get('id')
+            game_name = game.get('name')
+            price = game.get('cheapest_price', 'Цена неизвестна')
+
+            reply_text += f"• {game_name} - ${price}\n"
+            keyboard.append([
+                InlineKeyboardButton(f"Подробнее о {game_name}", callback_data=f"details_{game_id}")
+            ])
+
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(reply_text, reply_markup=reply_markup)
+
+    except Exception as e:
+        logger.error(f"Ошибка в similar_games: {e}")
+        await update.message.reply_text("Извините, произошла ошибка при поиске похожих игр.")
+
+async def price_history(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Показывает историю цен игры."""
+    if not context.args:
+        await update.message.reply_text("Пожалуйста, укажите ID игры для просмотра истории цен. Пример: /history 12345")
+        return
+
+    game_id = context.args[0]
+    await update.message.reply_text("Получаю историю цен...")
+
+    try:
+        history = await get_price_history(game_id)
+        game_details = await get_game_details(game_id)
+        
+        if not history or not game_details:
+            await update.message.reply_text("Не удалось получить историю цен.")
+            return
+
+        game_name = game_details.get('name', 'Неизвестная игра')
+        reply_text = f"📊 История цен для {game_name}:\n\n"
+
+        for i in range(len(history['dates'])):
+            date = history['dates'][i]
+            price = history['prices'][i]
+            store = history['stores'][i]
+            reply_text += f"📅 {date}\n💰 ${price} ({store})\n\n"
+
+        await update.message.reply_text(reply_text)
+
+    except Exception as e:
+        logger.error(f"Ошибка в price_history: {e}")
+        await update.message.reply_text("Извините, произошла ошибка при получении истории цен.")
