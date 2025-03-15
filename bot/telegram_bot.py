@@ -3,7 +3,7 @@ import logging
 import asyncio
 import threading
 from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, filters, CallbackQueryHandler
-from bot.handlers import start, help_command, search_games, subscribe_game, unsubscribe_game, list_subscriptions, check_discounts, button_handler, error_handler
+from bot.handlers import start, help_command, search_games, subscribe_game, unsubscribe_game, list_subscriptions, check_discounts, button_handler, error_handler, handle_message
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG, 
