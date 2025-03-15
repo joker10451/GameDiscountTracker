@@ -2,8 +2,8 @@
 Database models for Game Discount Tracker Bot
 """
 from datetime import datetime
-from sqlalchemy.dialects.postgresql import JSONB
 from flask_sqlalchemy import SQLAlchemy
+import json
 
 db = SQLAlchemy()
 
@@ -16,7 +16,7 @@ class User(db.Model):
     first_name = db.Column(db.String(255), nullable=True)
     last_name = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    settings = db.Column(JSONB, default={})
+    settings = db.Column(db.Text, default='{}')
     
     # Relationships
     subscriptions = db.relationship('Subscription', back_populates='user', cascade='all, delete-orphan')
@@ -32,7 +32,7 @@ class Game(db.Model):
     id = db.Column(db.String(64), primary_key=True)  # Game ID from API
     title = db.Column(db.String(255), nullable=False)
     thumbnail = db.Column(db.String(512), nullable=True)
-    details = db.Column(JSONB, default={})
+    details = db.Column(db.Text, default='{}')
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
