@@ -9,11 +9,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
-# Import store information
-from services.price_tracker import SUPPORTED_STORES
-
-# CheapShark API URL
-CHEAPSHARK_API_URL = "https://www.cheapshark.com/api/1.0"
+from services.config import CHEAPSHARK_API_URL, SUPPORTED_STORES
 
 async def search_game(
     query: str,
