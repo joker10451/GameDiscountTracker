@@ -215,8 +215,9 @@ async def get_current_discounts(
     """
     try:
         async with aiohttp.ClientSession() as session:
-            # Get deals sorted by savings
-            deals_url = f"{CHEAPSHARK_API_URL}/deals?pageSize={limit}&sortBy=savings"
+            # Get deals sorted by savings from all stores
+            stores_param = ','.join(SUPPORTED_STORES.keys())
+            deals_url = f"{CHEAPSHARK_API_URL}/deals?pageSize={limit}&sortBy=savings&storeID={stores_param}"
             
             async with session.get(deals_url) as response:
                 if response.status != 200:
@@ -239,16 +240,7 @@ async def get_current_discounts(
                     
                     # Get store name
                     store_id = deal.get('storeID')
-                    store_url = f"{CHEAPSHARK_API_URL}/stores"
-                    
-                    store_name = "Unknown Store"
-                    async with session.get(store_url) as store_response:
-                        if store_response.status == 200:
-                            stores = await store_response.json()
-                            for store in stores:
-                                if store.get('storeID') == store_id:
-                                    store_name = store.get('storeName')
-                                    break
+                    store_name = SUPPORTED_STORES.get(store_id, "Unknown Store")
                     
                     # Format the deal
                     results.append({
