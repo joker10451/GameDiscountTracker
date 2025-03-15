@@ -112,7 +112,7 @@ async def search_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             ])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(reply_text, reply_markup=reply_markup)
+        await update.message.reply_text(reply_text, reply_markup=reply_markup, parse_mode='Markdown')
 
     except Exception as e:
         logger.error(f"Ошибка в search_games: {e}")
@@ -205,7 +205,7 @@ async def list_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 ])
 
             reply_markup = InlineKeyboardMarkup(keyboard)
-            await update.message.reply_text(reply_text, reply_markup=reply_markup)
+            await update.message.reply_text(reply_text, reply_markup=reply_markup, parse_mode='Markdown')
 
     except Exception as e:
         logger.error(f"Ошибка в list_subscriptions: {e}")
@@ -257,7 +257,7 @@ async def check_discounts(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             ])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await progress_msg.edit_text(reply_text, reply_markup=reply_markup)
+        await progress_msg.edit_text(reply_text, reply_markup=reply_markup, parse_mode='Markdown')
 
     except Exception as e:
         logger.error(f"Ошибка в check_discounts: {e}")
@@ -349,7 +349,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             keyboard = [[InlineKeyboardButton(f"Подписаться на {game_name}", callback_data=f"sub_{game_id}")]]
             reply_markup = InlineKeyboardMarkup(keyboard)
 
-            await query.edit_message_text(text=details_text, reply_markup=reply_markup)
+            await query.edit_message_text(text=details_text, reply_markup=reply_markup, parse_mode='Markdown')
 
     except Exception as e:
         logger.error(f"Ошибка в button_handler: {e}")
@@ -437,7 +437,7 @@ async def similar_games(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
             ])
 
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(reply_text, reply_markup=reply_markup)
+        await update.message.reply_text(reply_text, reply_markup=reply_markup, parse_mode='Markdown')
 
     except Exception as e:
         logger.error(f"Ошибка в similar_games: {e}")
