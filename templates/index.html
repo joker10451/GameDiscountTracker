@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru" data-bs-theme="dark">
 <head>
@@ -5,141 +6,189 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Бот отслеживания скидок на игры</title>
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .store-card {
+            background: linear-gradient(45deg, #2b2b2b, #1a1a1a);
+            border-radius: 15px;
+        }
+        
+        .header-section {
+            background: linear-gradient(135deg, #1e2124 0%, #16181b 100%);
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 2rem 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .command-item {
+            border-left: 4px solid #0d6efd;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(13, 110, 253, 0.1);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .bot-status {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #1e2124 0%, #16181b 100%);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+    </style>
 </head>
 <body>
-    <div class="container py-5">
+    <div class="header-section animate__animated animate__fadeIn">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="display-4 mb-3">🎮 Бот скидок на игры</h1>
+                    <p class="lead mb-4">Отслеживайте снижение цен на ваши любимые игры в разных цифровых магазинах!</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/settings" class="btn btn-outline-light btn-lg">
+                        <i class="bi bi-gear"></i> Настройки
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<div id="priceHistoryChart" class="mt-4" style="width: 100%; max-width: 800px; margin: auto;">
-    <canvas id="priceChart"></canvas>
-</div>
-
-        <div class="row justify-content-center">
+    <div class="container py-4">
+        <div class="row justify-content-center g-4">
             <div class="col-md-8">
-                <div class="d-flex justify-content-between align-items-center mb-5">
-                    <div>
-                        <h1 class="display-4">🎮 Бот скидок на игры</h1>
-                        <p class="lead">Отслеживайте снижение цен на ваши любимые игры в разных цифровых магазинах!</p>
-                    </div>
-                    <div>
-                        <a href="/settings" class="btn btn-outline-secondary">
-                            <i class="bi bi-gear"></i> Настройки
-                        </a>
-                    </div>
-                </div>
-
-                <div class="card mb-4 bg-dark">
+                <div class="card mb-4 animate__animated animate__fadeInUp">
                     <div class="card-body">
-                        <h2 class="card-title">Как это работает</h2>
-                        <div class="card-text">
-                            <ol class="list-group list-group-numbered mb-3">
-                                <li class="list-group-item bg-dark">Запустите бота в Telegram</li>
-                                <li class="list-group-item bg-dark">Найдите ваши любимые игры</li>
-                                <li class="list-group-item bg-dark">Подпишитесь на уведомления о ценах</li>
-                                <li class="list-group-item bg-dark">Получайте уведомления при снижении цен!</li>
-                            </ol>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-4 bg-dark">
-                    <div class="card-body">
-                        <h2 class="card-title">Доступные команды</h2>
-                        <div class="card-text">
-                            <ul class="list-group mb-3">
-                                <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/start</code></span>
-                                    <span>Запуск бота</span>
-                                </li>
-                                <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/help</code></span>
-                                    <span>Показать справку</span>
-                                </li>
-                                <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/search &lt;название_игры&gt;</code></span>
-                                    <span>Поиск игр</span>
-                                </li>
-                                <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/subscribe &lt;id_игры&gt;</code></span>
-                                    <span>Подписаться на уведомления о цене</span>
-                                </li>
-                                <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/unsubscribe &lt;id_игры&gt;</code></span>
-                                    <span>Отписаться от уведомлений о цене</span>
-                                </li>
-                                <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/mysubs</code></span>
-                                    <span>Список ваших подписок</span>
-                                </li>
-                                <li class="list-group-item bg-dark d-flex justify-content-between">
-                                    <span><code>/discounts</code></span>
-                                    <span>Показать текущие скидки</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card mb-4 bg-dark">
-                    <div class="card-body">
-                        <h2 class="card-title">Поддерживаемые магазины игр</h2>
-                        <div class="card-text">
-                            <div class="row text-center">
-                                <div class="col-md-4 mb-3">
-                                    <div class="card bg-secondary">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Steam</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card bg-secondary">
-                                        <div class="card-body">
-                                            <h5 class="card-title">Epic Games</h5>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4 mb-3">
-                                    <div class="card bg-secondary">
-                                        <div class="card-body">
-                                            <h5 class="card-title">GOG</h5>
-                                        </div>
-                                    </div>
+                        <h2 class="card-title mb-4">Как это работает</h2>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded">
+                                    <h5>1. Запустите бота</h5>
+                                    <p class="mb-0 text-muted">Найдите бота в Telegram и начните диалог</p>
                                 </div>
                             </div>
-                            <div class="text-center mt-3">
-                                <p class="text-muted">...и многие другие!</p>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded">
+                                    <h5>2. Найдите игры</h5>
+                                    <p class="mb-0 text-muted">Используйте поиск для нахождения интересующих игр</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded">
+                                    <h5>3. Подпишитесь</h5>
+                                    <p class="mb-0 text-muted">Подпишитесь на уведомления о снижении цен</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 bg-dark rounded">
+                                    <h5>4. Получайте уведомления</h5>
+                                    <p class="mb-0 text-muted">Узнавайте первым о снижении цен</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Доступные команды</h2>
+                        <div class="command-list">
+                            <div class="command-item">
+                                <code>/search &lt;название_игры&gt;</code>
+                                <small class="text-muted ms-2">Поиск игры</small>
+                            </div>
+                            <div class="command-item">
+                                <code>/subscribe &lt;id_игры&gt;</code>
+                                <small class="text-muted ms-2">Подписаться на уведомления</small>
+                            </div>
+                            <div class="command-item">
+                                <code>/mysubs</code>
+                                <small class="text-muted ms-2">Список подписок</small>
+                            </div>
+                            <div class="command-item">
+                                <code>/discounts</code>
+                                <small class="text-muted ms-2">Текущие скидки</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.4s">
+                    <div class="card-body">
+                        <h2 class="card-title mb-4">Поддерживаемые магазины</h2>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="store-card p-3 text-center">
+                                    <h5>Steam</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="store-card p-3 text-center">
+                                    <h5>Epic Games</h5>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="store-card p-3 text-center">
+                                    <h5>GOG</h5>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {% if bot_status == 'active' %}
-                <div class="alert alert-success text-center">
-                    <p class="mb-0">
-                        <strong>Бот активен и готов к работе!</strong> Найдите <a href="https://t.me/GameDiscountTrackerBot" class="alert-link" target="_blank">@GameDiscountTrackerBot</a> в Telegram, чтобы начать отслеживать скидки на игры.
-                    </p>
+                <div class="alert alert-success bot-status">
+                    <div class="d-flex align-items-center">
+                        <div class="me-3">
+                            <i class="bi bi-check-circle-fill fs-4"></i>
+                        </div>
+                        <div>
+                            <h5 class="alert-heading mb-1">Бот активен и готов к работе!</h5>
+                            <p class="mb-0">
+                                Найдите <a href="https://t.me/GameDiscountTrackerBot" class="alert-link">@GameDiscountTrackerBot</a> в Telegram
+                            </p>
+                        </div>
+                    </div>
                 </div>
                 {% else %}
-                <div class="alert alert-warning text-center">
-                    <p class="mb-0">
-                        <strong>Бот в настоящее время неактивен.</strong> Для активации бота необходимо установить переменную окружения TELEGRAM_TOKEN.
-                    </p>
+                <div class="alert alert-warning bot-status">
+                    <h5 class="alert-heading">Бот в настоящее время неактивен</h5>
+                    <p>Для активации бота необходимо установить переменную окружения TELEGRAM_TOKEN</p>
                     <hr>
-                    <p class="small mb-0">
-                        1. Создайте бота с помощью <a href="https://t.me/BotFather" class="alert-link" target="_blank">@BotFather</a> в Telegram<br>
-                        2. Скопируйте токен вашего бота<br>
-                        3. Установите переменную окружения TELEGRAM_TOKEN<br>
-                        4. Перезапустите приложение
-                    </p>
+                    <ol class="mb-0 small">
+                        <li>Создайте бота с помощью <a href="https://t.me/BotFather" class="alert-link">@BotFather</a></li>
+                        <li>Скопируйте токен вашего бота</li>
+                        <li>Установите переменную окружения TELEGRAM_TOKEN</li>
+                        <li>Перезапустите приложение</li>
+                    </ol>
                 </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <footer class="footer mt-auto py-3 bg-dark text-center">
+    <footer class="footer text-center">
         <div class="container">
             <span class="text-muted">Бот отслеживания скидок на игры © 2025</span>
         </div>

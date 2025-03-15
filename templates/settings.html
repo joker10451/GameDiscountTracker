@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru" data-bs-theme="dark">
 <head>
@@ -5,112 +6,170 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Настройки - Бот отслеживания скидок на игры</title>
     <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        .card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-section {
+            background: linear-gradient(135deg, #1e2124 0%, #16181b 100%);
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 0 0 2rem 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-active {
+            background: #28a745;
+            box-shadow: 0 0 10px rgba(40, 167, 69, 0.5);
+        }
+
+        .status-inactive {
+            background: #dc3545;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.5);
+        }
+
+        .footer {
+            background: linear-gradient(135deg, #1e2124 0%, #16181b 100%);
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        .input-token {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-token:focus {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+    </style>
 </head>
 <body>
-    <div class="container py-5">
+    <div class="header-section animate__animated animate__fadeIn">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">Настройки бота</h1>
+                <a href="/" class="btn btn-outline-light">
+                    <i class="bi bi-arrow-left"></i> На главную
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h1 class="h3">Настройки</h1>
-                    <a href="/" class="btn btn-sm btn-outline-secondary">Вернуться на главную</a>
-                </div>
-
-                <div class="card mb-4 bg-dark">
+                <div class="card mb-4 animate__animated animate__fadeInUp">
                     <div class="card-body">
-                        <h5 class="card-title">Конфигурация бота</h5>
-                        
-                        <div class="alert alert-{{ 'success' if bot_status == 'active' else 'warning' }} mb-4">
-                            <div class="d-flex">
-                                <div class="me-3">
-                                    {% if bot_status == 'active' %}
-                                    <i class="bi bi-check-circle-fill fs-4"></i>
-                                    {% else %}
-                                    <i class="bi bi-exclamation-triangle-fill fs-4"></i>
-                                    {% endif %}
-                                </div>
-                                <div>
-                                    <h6 class="alert-heading">Статус бота: {{ 'Активен' if bot_status == 'active' else 'Неактивен' }}</h6>
-                                    <p class="mb-0">
-                                        {% if bot_status == 'active' %}
-                                        Бот запущен и готов обрабатывать команды.
-                                        {% else %}
-                                        Бот не запущен. Пожалуйста, настройте токен вашего Telegram бота.
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </div>
+                        <div class="d-flex align-items-center mb-4">
+                            <div class="status-indicator {{ 'status-active' if bot_status == 'active' else 'status-inactive' }}"></div>
+                            <h5 class="card-title mb-0">
+                                Статус: {{ 'Активен' if bot_status == 'active' else 'Неактивен' }}
+                            </h5>
                         </div>
-                        
+
                         {% with messages = get_flashed_messages(with_categories=true) %}
                             {% if messages %}
                                 {% for category, message in messages %}
-                                <div class="alert alert-{{ category }}">{{ message }}</div>
+                                <div class="alert alert-{{ category }} animate__animated animate__fadeIn">
+                                    {{ message }}
+                                </div>
                                 {% endfor %}
                             {% endif %}
                         {% endwith %}
 
-                        <form method="POST" action="/settings">
-                            <div class="mb-3">
+                        <form method="POST" action="/settings" class="mb-4">
+                            <div class="mb-4">
                                 <label for="telegram_token" class="form-label">Токен Telegram бота</label>
                                 <div class="input-group">
-                                    <input type="password" class="form-control" id="telegram_token" name="telegram_token"
-                                           placeholder="Введите токен вашего Telegram бота" 
+                                    <input type="password" 
+                                           class="form-control input-token" 
+                                           id="telegram_token" 
+                                           name="telegram_token"
+                                           placeholder="Введите токен бота" 
                                            value="{{ telegram_token }}">
-                                    <button class="btn btn-outline-secondary" type="button" 
-                                            onclick="toggleTokenVisibility()" 
+                                    <button class="btn btn-outline-secondary" 
+                                            type="button"
+                                            onclick="toggleTokenVisibility()"
                                             id="toggleVisibility">
-                                        Показать
+                                        <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
                                 <div class="form-text">
-                                    Получите его у <a href="https://t.me/BotFather" target="_blank">@BotFather</a> в Telegram
+                                    Получите токен у <a href="https://t.me/BotFather" target="_blank">@BotFather</a>
                                 </div>
                             </div>
-                            
-                            <div class="alert alert-info small">
-                                <h6 class="alert-heading">Как получить токен Telegram бота:</h6>
-                                <ol class="mb-0">
-                                    <li>Откройте Telegram и найдите <a href="https://t.me/BotFather" target="_blank">@BotFather</a></li>
-                                    <li>Отправьте команду <code>/newbot</code> для создания нового бота</li>
-                                    <li>Следуйте инструкциям, чтобы назвать своего бота</li>
-                                    <li>После создания BotFather даст вам токен (например, <code>123456789:ABCdefGhIJKlmNoPQRsTUVwxyZ</code>)</li>
-                                    <li>Скопируйте этот токен и вставьте его в поле выше</li>
-                                </ol>
-                            </div>
-                            
+
                             <div class="d-grid gap-2">
-                                <button type="submit" class="btn btn-primary">Сохранить токен</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-save"></i> Сохранить
+                                </button>
                                 {% if bot_status == 'active' %}
-                                <a href="/restart_bot" class="btn btn-secondary">Перезапустить бота</a>
+                                <a href="/restart_bot" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-clockwise"></i> Перезапустить бота
+                                </a>
                                 {% endif %}
                             </div>
                         </form>
+
+                        <div class="alert alert-info mb-0">
+                            <h6 class="alert-heading">Как получить токен:</h6>
+                            <ol class="mb-0">
+                                <li>Откройте Telegram и найдите <a href="https://t.me/BotFather" target="_blank">@BotFather</a></li>
+                                <li>Отправьте команду <code>/newbot</code></li>
+                                <li>Следуйте инструкциям для создания бота</li>
+                                <li>Скопируйте полученный токен</li>
+                            </ol>
+                        </div>
                     </div>
                 </div>
-                
-                <div class="card mb-4 bg-dark">
+
+                <div class="card animate__animated animate__fadeInUp" style="animation-delay: 0.2s">
                     <div class="card-body">
-                        <h5 class="card-title">Настройки проверки цен</h5>
-                        <p class="card-text">Система настроена на проверку цен в следующие интервалы:</p>
-                        <ul class="list-group mb-3">
-                            <li class="list-group-item bg-dark d-flex justify-content-between">
-                                <span>Ежедневная проверка цен</span>
-                                <span>Полночь (00:00 UTC)</span>
-                            </li>
-                            <li class="list-group-item bg-dark d-flex justify-content-between">
-                                <span>Частая проверка цен</span>
-                                <span>Каждые 4 часа</span>
-                            </li>
-                        </ul>
-                        <p class="card-text small text-muted">Эти интервалы можно настроить в конфигурации сервера.</p>
+                        <h5 class="card-title mb-4">Настройки проверки цен</h5>
+                        <div class="list-group mb-0">
+                            <div class="list-group-item bg-dark d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Ежедневная проверка</h6>
+                                    <small class="text-muted">Полная проверка всех игр</small>
+                                </div>
+                                <span class="badge bg-primary">00:00 UTC</span>
+                            </div>
+                            <div class="list-group-item bg-dark d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-0">Быстрая проверка</h6>
+                                    <small class="text-muted">Проверка активных подписок</small>
+                                </div>
+                                <span class="badge bg-primary">Каждые 4 часа</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="footer mt-auto py-3 bg-dark text-center">
+    <footer class="footer text-center">
         <div class="container">
             <span class="text-muted">Бот отслеживания скидок на игры © 2025</span>
         </div>
@@ -120,24 +179,17 @@
         function toggleTokenVisibility() {
             const tokenInput = document.getElementById('telegram_token');
             const toggleBtn = document.getElementById('toggleVisibility');
+            const icon = toggleBtn.querySelector('i');
             
             if (tokenInput.type === 'password') {
                 tokenInput.type = 'text';
-                toggleBtn.textContent = 'Скрыть';
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
             } else {
                 tokenInput.type = 'password';
-                toggleBtn.textContent = 'Показать';
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
             }
-        }
-        
-        function saveToken() {
-            const token = document.getElementById('telegram_token').value;
-            
-            // This is a placeholder - in a real application you would securely send this to the backend
-            alert('В рабочей среде этот токен будет безопасно сохранен и бот будет перезапущен.\n\nДля демонстрации, пожалуйста, вручную установите переменную окружения TELEGRAM_TOKEN.');
-            
-            // You could implement a proper POST request here to securely save the token on the server side
-            // For security reasons, it's usually better to set this via environment variables
         }
     </script>
 </body>
